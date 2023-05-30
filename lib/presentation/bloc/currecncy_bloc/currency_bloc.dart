@@ -3,12 +3,18 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:coin_currency/data/datasources/database/hive_service.dart';
 import 'package:coin_currency/data/datasources/repositories/server_repository.dart';
+import 'package:coin_currency/data/models/currency_model/currency_history_model.dart';
 import 'package:coin_currency/data/models/currency_model/currency_view_model.dart';
+import 'package:coin_currency/utils/conversion_currency_utility.dart';
+import 'package:coin_currency/utils/extensions/math_extensions.dart';
+import 'package:coin_currency/utils/helpers/dialog_helper.dart';
 import 'package:equatable/equatable.dart';
 import 'package:fimber/fimber.dart';
+import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 part 'currency_event.dart';
 part 'currency_state.dart';
@@ -26,8 +32,8 @@ class CurrencyBloc extends Bloc<CurrencyEvent, CurrencyState> {
       DateFormat('MMMM dd, yyyy').format(selectedDateValue);
 
   final currencies = <CurrencyViewModel>[];
-  final currenciesHistory = <CurrencyViewModel>[];
-  CurrencyViewModel currencyModel = CurrencyViewModel();
+  final currenciesHistory = <CurrencyHistoryModel>[];
+  CurrencyHistoryModel currencyHistoryItem = CurrencyHistoryModel();
 
   static const maxValueLimit = 999999;
 
@@ -109,6 +115,73 @@ class CurrencyBloc extends Bloc<CurrencyEvent, CurrencyState> {
     emit(CurrencyLoaded(
       currency: currencies,
     ));
+  }
+
+  void refreshFromConversionValueWithIndex(int value) {
+    _fromConversionValueIndicatorController.add(currencies.elementAt(value));
+    autoRefreshConversionRate();
+  }
+
+  void refreshToConversionValueWithIndex(int value) {
+    _toConversionValueIndicatorController.add(currencies.elementAt(value));
+    autoRefreshConversionRate();
+  }
+
+  Future<void> autoRefreshConversionRate() async {
+    _conversionValueController.add(
+        ConversionCurrencyUtility.calculateConversionValue(
+            typedConversionValue, toConversionValue, fromConversionValue));
+    if (typedConversionValue != 0) {
+      currencyHistoryItem = CurrencyHistoryModel(
+          currentDate: currentDate,
+          fromCurrencyCode: toConversionValue.code,
+          fromCurrencyValue: typedConversionValue,
+          toCurrencyCode: fromConversionValue.code,
+          toCurrencyValue: conversionValue);
+      currenciesHistory.add(currencyHistoryItem);
+      if (currenciesHistory.length > 30) {
+        currenciesHistory.remove(29);
+      }
+      await _hiveService.storeCurrenciesToHistoryWithKey(currenciesHistory);
+    }
+  }
+
+  void exchangeCurrencyConversions() {
+    final fromCurrency = fromConversionValue;
+    _fromConversionValueIndicatorController.add(toConversionValue);
+    _toConversionValueIndicatorController.add(fromCurrency);
+
+    final typedValue = typedConversionValue;
+
+    _typedConversionValueController.add(conversionValue);
+    _conversionValueController.add(typedValue);
+    autoRefreshConversionRate();
+  }
+
+  void insertToTypedValueRate(
+      int value, BuildContext context, AppLocalizations localization) {
+    if (typedConversionValue < maxValueLimit) {
+      _typedConversionValueController.add((typedConversionValue * 10) + value);
+      autoRefreshConversionRate();
+    } else {
+      showExceedInputLimitInfoDialog(
+          context: context, localization: localization);
+    }
+  }
+
+  void deleteAllDigitsFromTypedValue() {
+    _typedConversionValueController.add(0);
+    autoRefreshConversionRate();
+  }
+
+  void deleteDigitOneByOneFromTypedValue() {
+    if (typedConversionValue > 1) {
+      _typedConversionValueController
+          .add(typedConversionValue.makeLastDigitDroppped);
+    } else {
+      _typedConversionValueController.add(0);
+    }
+    autoRefreshConversionRate();
   }
 
   @override

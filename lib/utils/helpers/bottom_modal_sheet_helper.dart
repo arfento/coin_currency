@@ -1,11 +1,13 @@
 import 'package:coin_currency/config/constants/colors.dart';
+import 'package:coin_currency/presentation/bloc/currecncy_bloc/currency_bloc.dart';
+import 'package:coin_currency/presentation/widgets/bottom_modal/select_currency_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void showFromCurrencyBottomModal(
   context,
   AppLocalizations localization,
-  // CurrencyBloc currencyBloc,
+  CurrencyBloc currencyBloc,
   String? selectedCurrencyName, {
   required bool toConversionBoolean,
 }) {
@@ -19,13 +21,11 @@ void showFromCurrencyBottomModal(
     ),
     context: context,
     builder: (BuildContext context) {
-      //todo
-      return Container();
-      // SelectCurrencyModal(
-      //     selectedCurrencyName: selectedCurrencyName,
-      //     localization: localization,
-      //     toConversion: toConversionBoolean,
-      //     currencyBloc: currencyBloc);
+      return SelectCurrencyModal(
+          selectedCurrencyName: selectedCurrencyName,
+          localizations: localization,
+          toConversion: toConversionBoolean,
+          currencyBloc: currencyBloc);
     },
   );
 }

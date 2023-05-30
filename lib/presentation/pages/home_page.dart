@@ -9,19 +9,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+class HomePage extends StatelessWidget {
+  const HomePage({
+    Key? key,
+  }) : super(key: key);
 
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<NavigationTabController>(
-        create: (context) => NavigationTabController(),
-        child: const _HomePageBody());
+      create: (context) => NavigationTabController(),
+      child: const _HomePageBody(),
+    );
   }
 }
 
@@ -34,6 +32,9 @@ class _HomePageBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
+      extendBody: false,
+      extendBodyBehindAppBar: true, // Needed to show content under appbar
+      bottomNavigationBar: const MainNavigationBottomBar(),
       body: Consumer<NavigationTabController>(
         builder: (__, nav, _) => BlocProvider(
             create: (_) => CurrencyBloc()..add(CurrencyLoadEvent()),
@@ -53,10 +54,6 @@ class _HomePageBody extends StatelessWidget {
               return const LoadingWidget();
             })),
       ),
-
-      extendBody: false,
-      extendBodyBehindAppBar: true, // Needed to show content under appbar
-      bottomNavigationBar: const MainNavigationBottomBar(),
     );
   }
 }

@@ -16,19 +16,19 @@ class BottomBarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _provider = context.watch<NavigationTabController>();
-    final _isActive = _provider.isActive(index);
+    final provider = context.watch<NavigationTabController>();
+    final isActive = provider.isActive(index);
     return GestureDetector(
-        onTap: () => _provider.jumpToTab(index),
+        onTap: () => provider.jumpToTab(index),
         child: Container(
           padding: EdgeInsets.all(2.w),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            color: _isActive ? AppColors.mainBlueColor : AppColors.whiteColor,
+            color: isActive ? AppColors.mainBlueColor : AppColors.whiteColor,
           ),
           child: Icon(
             icon,
-            color: _isActive
+            color: isActive
                 ? AppColors.whiteColor
                 : AppColors.bottomNavigationDeactiveColor,
             size: 4.h,

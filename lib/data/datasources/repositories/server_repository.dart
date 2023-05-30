@@ -7,12 +7,14 @@ import 'package:http/http.dart';
 class ServerRepository {
   final cl = Client();
 
+  //Get Currencies Data
   Future<List<CurrencyViewModel>> getCurrencies(String? date) async {
-    final _response = await cl.get(_getParsedUri("/$date.xml"));
-    if (_response.successResponse) {
-      Fimber.e("Fetched currency items successfully");
-      final _currencies = ParseCurrenciesXMLData.parseCurrenciesXML(_response);
-      return _currencies;
+    final response = await cl.get(_getParsedUri("/$date.xml"));
+
+    if (response.successResponse) {
+      Fimber.e('Fetched currency items successfully 🤑');
+      final currencies = ParseCurrenciesXMLData.parseCurrenciesXML(response);
+      return currencies;
     } else {
       Fimber.e('Problem occured while fetching currency items 😥');
       return [];
@@ -20,7 +22,7 @@ class ServerRepository {
   }
 
   Uri _getParsedUri(String route, [Map<String, dynamic>? params]) {
-    return Uri.parse("${AppStrings.apiHost}$route")
+    return Uri.parse('${AppStrings.apiHost}$route')
         .replace(queryParameters: params);
   }
 }

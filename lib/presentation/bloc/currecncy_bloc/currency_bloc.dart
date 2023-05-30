@@ -15,7 +15,6 @@ part 'currency_state.dart';
 
 class CurrencyBloc extends Bloc<CurrencyEvent, CurrencyState> {
   CurrencyBloc() : super(CurrencyInitial()) {
-    on<CurrencyEvent>((event, emit) {});
     on<CurrencyLoadEvent>(_onBlocLoad);
   }
 
@@ -45,41 +44,46 @@ class CurrencyBloc extends Bloc<CurrencyEvent, CurrencyState> {
   ///
   Future<FutureOr<void>> _onBlocLoad(
       CurrencyLoadEvent event, Emitter<CurrencyState> emit) async {
-    emit(CurrencyLoading());
+    _emitLoadingState(emit); // <- Loading currency page;
+
     _clearCurrencies();
 
     try {
-      if (_hiveService.checkHistoryIsNotEmpty()) {
-        final cachedCurrenciesData =
-            _hiveService.fetchCurrenciesHistoryWithKey();
-        cachedCurrenciesData.forEach(currenciesHistory.add);
-        // for (var element in cachedCurrenciesData) {
-        //   currenciesHistory.add(element);
+      _checkCurrenciesHistory();
 
-        // }
-      }
-      if (_hiveService.checkDateIsCached(currentDate)) {
-        final cachedCurrenciesData =
-            _hiveService.fetchCachedCurrenciesWithDate(currentDate);
-
-        cachedCurrenciesData.forEach(currencies.add);
-      } else {
-        final response = await serverRepository.getCurrencies(currentDate);
-        await _hiveService.storeCachedCurrenciesWithDate(currentDate, response);
-        currencies.addAll(response);
-      }
-
-      _addDefaultValuesToControllers();
+      await _checkIsCurrencyCached();
 
       _checkEmittingState(currencies, emit);
     } on Exception catch (e) {
       emit(CurrencyError());
-      Fimber.e("Exception during currency details fetching 😥", ex: e);
+      Fimber.e('Exception during currency details fetching 😥', ex: e);
     }
   }
 
   void _clearCurrencies() {
     currencies.clear();
+  }
+
+  void _checkCurrenciesHistory() {
+    if (_hiveService.checkHistoryIsNotEmpty()) {
+      final cachedCurrenciesData = _hiveService.fetchCurrenciesHistoryWithKey();
+      cachedCurrenciesData.forEach(currenciesHistory.add);
+    }
+  }
+
+  Future<void> _checkIsCurrencyCached() async {
+    if (_hiveService.checkDateIsCached(currentDate)) {
+      final cachedCurrenciesData =
+          _hiveService.fetchCachedCurrenciesWithDate(currentDate);
+
+      cachedCurrenciesData.forEach(currencies.add);
+    } else {
+      final response = await serverRepository.getCurrencies(currentDate);
+      await _hiveService.storeCachedCurrenciesWithDate(currentDate, response);
+      currencies.addAll(response);
+    }
+
+    _addDefaultValuesToControllers();
   }
 
   void _addDefaultValuesToControllers() {
@@ -88,6 +92,10 @@ class CurrencyBloc extends Bloc<CurrencyEvent, CurrencyState> {
     _typedConversionValueController.add(1);
     _conversionValueController
         .add(currencies.elementAt(1).value! * typedConversionValue);
+  }
+
+  void _emitLoadingState(emit) {
+    emit(CurrencyLoading());
   }
 
   void _checkEmittingState(List<CurrencyViewModel> _currencies, emit) {

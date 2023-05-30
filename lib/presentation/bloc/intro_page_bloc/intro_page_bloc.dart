@@ -37,10 +37,11 @@ class IntroPageBloc extends Bloc<IntroPageEvent, IntroPageState> {
 
     sliderList = IntroPageSliderDataUtility.getSliderItems(event.localizations);
     sliders.addAll(sliderList);
+
     onPageControllerChange(0);
+    Fimber.d('Sliders entity has been loaded successfully 🔄');
     pageController.addListener(() => onPageControllerChange(currentPage));
     emit(IntroPageLoaded(sliderList));
-    Fimber.d('Sliders entity has been loaded successfully 🔄');
   }
 
   void onPageChanged(int index) {

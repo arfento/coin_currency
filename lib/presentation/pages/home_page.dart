@@ -34,28 +34,28 @@ class _HomePageBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
-      body: Consumer<NavigationTabController>(builder: (context, value, child) {
-        return BlocProvider(
-          create: (context) => CurrencyBloc(),
-          child: BlocBuilder<CurrencyBloc, CurrencyState>(
-            builder: (context, state) {
+      body: Consumer<NavigationTabController>(
+        builder: (__, nav, _) => BlocProvider(
+            create: (_) => CurrencyBloc()..add(CurrencyLoadEvent()),
+            child: BlocBuilder<CurrencyBloc, CurrencyState>(
+                builder: (context, state) {
+              print("home state : $state");
               final currencyBloc = context.read<CurrencyBloc>();
               if (state is CurrencyLoading) {
                 return const LoadingWidget();
               }
               if (state is CurrencyLoaded) {
-                return _HomePageBody.pages[value.index];
+                return _HomePageBody.pages[nav.index];
               }
               if (state is CurrencyError) {
                 return ErrorPage(currencyBloc: currencyBloc);
               }
               return const LoadingWidget();
-            },
-          ),
-        );
-      }),
+            })),
+      ),
+
       extendBody: false,
-      extendBodyBehindAppBar: true,
+      extendBodyBehindAppBar: true, // Needed to show content under appbar
       bottomNavigationBar: const MainNavigationBottomBar(),
     );
   }

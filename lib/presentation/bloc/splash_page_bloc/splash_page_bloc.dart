@@ -17,7 +17,6 @@ class SplashPageBloc extends Bloc<SplashPageEvent, SplashPageState> {
   NavigationService get _navigation => GetIt.I.get<NavigationService>();
 
   SplashPageBloc() : super(SplashPageInitial()) {
-    on<SplashPageEvent>((event, emit) {});
     on<SplashPageLoadEvent>(_onBlocLoad);
   }
 
@@ -26,8 +25,8 @@ class SplashPageBloc extends Bloc<SplashPageEvent, SplashPageState> {
     emit(SplashPageLoading());
 
     try {
-      bool? _seen = await _sharedPreferences.getIntroPageSeen();
-      if (_seen != null) {
+      bool? seen = await _sharedPreferences.getIntroPageSeen();
+      if (seen != null) {
         Timer(const Duration(seconds: 3), () {
           _forceHomePage(event.context);
         });
@@ -36,9 +35,7 @@ class SplashPageBloc extends Bloc<SplashPageEvent, SplashPageState> {
           _forceIntroPage(event.context);
         });
       }
-      Fimber.d(
-        'Splash page has been loaded successfully 👍',
-      );
+      Fimber.d('Splash page has been loaded successfully 👍');
       emit(const SplashPageLoaded(true));
     } on Exception catch (e) {
       emit(SplashPageError());

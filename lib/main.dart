@@ -16,8 +16,7 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+void main() async {
   runZonedGuarded<Future<void>>(() async {
     WidgetsFlutterBinding.ensureInitialized();
 
@@ -32,7 +31,6 @@ Future<void> main() async {
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: AppColors.transparentColor,
     ));
-    WidgetsFlutterBinding.ensureInitialized();
 
     SystemChrome.setPreferredOrientations(
             [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown])

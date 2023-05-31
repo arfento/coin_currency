@@ -20,9 +20,9 @@ class CurrencyHistoryPage extends StatelessWidget {
       body: currencyBloc.currenciesHistory.isEmpty
           ? CurrencyHistoryEmpty(localization: localization)
           : SingleChildScrollView(
-              physics: BouncingScrollPhysics(),
+              physics: const BouncingScrollPhysics(),
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: Column(
                   children: <Widget>[
                     SizedBox(height: 5.h),
@@ -60,7 +60,7 @@ class CurrencyHistoryPage extends StatelessWidget {
       removeBottom: true,
       child: ListView.separated(
         shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         itemCount: currencyBloc.currenciesHistory.length,
         itemBuilder: (context, index) {
           return Padding(
@@ -71,7 +71,7 @@ class CurrencyHistoryPage extends StatelessWidget {
           );
         },
         separatorBuilder: (context, index) {
-          return Divider(
+          return const Divider(
             thickness: 1,
             color: AppColors.mainDividerBackColor,
           );

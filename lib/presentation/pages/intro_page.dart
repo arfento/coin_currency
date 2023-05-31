@@ -16,13 +16,13 @@ class IntroPage extends StatefulWidget {
 class _IntroPageState extends State<IntroPage> {
   @override
   Widget build(BuildContext context) {
-    final _localization = AppLocalizations.of(context)!;
+    final localization = AppLocalizations.of(context)!;
     return BlocProvider(
       create: (context) =>
-          IntroPageBloc()..add(IntroPageLoadEvent(_localization)),
+          IntroPageBloc()..add(IntroPageLoadEvent(localization)),
       child: Scaffold(
         backgroundColor: AppColors.whiteColor,
-        body: _IntroPageBody(localization: _localization),
+        body: _IntroPageBody(localization: localization),
       ),
     );
   }
@@ -40,18 +40,18 @@ class _IntroPageBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<IntroPageBloc, IntroPageState>(
       builder: (context, state) {
-        final _bloc = context.read<IntroPageBloc>();
+        final bloc = context.read<IntroPageBloc>();
         return PageView.builder(
           scrollDirection: Axis.horizontal,
           physics: const BouncingScrollPhysics(),
-          controller: _bloc.pageController,
-          onPageChanged: _bloc.onPageChanged,
-          itemCount: _bloc.sliders.length,
+          controller: bloc.pageController,
+          onPageChanged: bloc.onPageChanged,
+          itemCount: bloc.sliders.length,
           itemBuilder: (context, index) {
             return IntroSliderItemWidget(
               index: index,
-              slider: _bloc.sliders,
-              bloc: _bloc,
+              slider: bloc.sliders,
+              bloc: bloc,
               localizations: localization,
             );
           },

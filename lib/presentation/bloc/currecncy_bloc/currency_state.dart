@@ -17,7 +17,7 @@ class CurrencyLoading extends CurrencyState {}
 class CurrencyLoaded extends CurrencyState {
   final List<CurrencyViewModel>? currency;
   const CurrencyLoaded({
-    this.currency,
+    required this.currency,
   });
 
   @override
